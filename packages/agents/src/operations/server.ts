@@ -5,6 +5,7 @@ import {
   CallToolRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { connect } from '@anima/core';
+import { startHttpServer } from '../shared/http-server.js';
 import { OPERATIONS_TOOLS } from './tools.js';
 import { vetProvider } from './handlers/vet-provider.js';
 import { assignJob } from './handlers/assign-job.js';
@@ -82,5 +83,6 @@ export async function startServer(
     return;
   }
 
-  throw new Error('HTTP transport not yet implemented. Set ANIMA_TRANSPORT=stdio for local dev.');
+  const port = parseInt(process.env['OPERATIONS_AGENT_PORT'] ?? '3012', 10);
+  startHttpServer(server, port);
 }

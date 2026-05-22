@@ -5,6 +5,7 @@ import {
   CallToolRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { connect } from '@anima/core';
+import { startHttpServer } from '../shared/http-server.js';
 import { GROWTH_TOOLS } from './tools.js';
 import { checkRankings } from './handlers/check-rankings.js';
 import { generateSeoContent } from './handlers/generate-seo-content.js';
@@ -74,7 +75,6 @@ export async function startServer(
     return;
   }
 
-  // HTTP/SSE transport — persistent server for Railway production.
-  // Full HTTP wiring (express + SSEServerTransport) added in Sprint 6 full harness.
-  throw new Error('HTTP transport not yet implemented. Set ANIMA_TRANSPORT=stdio for local dev.');
+  const port = parseInt(process.env['GROWTH_AGENT_PORT'] ?? '3010', 10);
+  startHttpServer(server, port);
 }

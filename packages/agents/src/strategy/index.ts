@@ -1,4 +1,5 @@
 export { StrategyAgent } from './strategy-agent.js';
+export { startServer as startStrategyServer } from './server.js';
 export { runIntake } from './intake.js';
 export { buildGoalTree } from './goal-tree-builder.js';
 export { generateHumanTasks } from './human-task-generator.js';

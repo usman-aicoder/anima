@@ -3,8 +3,13 @@ import type { MessageParam, Tool, ToolUseBlock } from '@anthropic-ai/sdk/resourc
 import { DecisionLogger, type DecisionEntry } from './decision-logger.js';
 import { SessionManager } from './session-manager.js';
 import { WorldModelClient } from './world-model-client.js';
+import { compactMessages } from './harness/compaction.js';
 import type { AgentName } from './db/models/agent-decision.model.js';
 import type { IGoal } from './db/models/goal.model.js';
+
+// 80% of the default max_tokens_per_session threshold (80 000).
+// When accumulated input tokens across iterations exceed this, compact messages.
+const COMPACTION_THRESHOLD = 64_000;
 
 export interface AgentContext {
   goals: IGoal[];
@@ -83,6 +88,7 @@ export abstract class BaseAgent {
 
     const messages: MessageParam[] = [];
     let iteration = 0;
+    let accumulatedInputTokens = 0;
 
     try {
       while (iteration < this.getIterationCap()) {
@@ -105,14 +111,23 @@ export abstract class BaseAgent {
           messages,
         });
 
-        // 4. Checkpoint conversation state
+        // 4. Accumulate tokens and compact if approaching limit
+        accumulatedInputTokens += response.usage.input_tokens;
+        if (accumulatedInputTokens > COMPACTION_THRESHOLD && messages.length > 2) {
+          const compacted = await compactMessages(messages, this.client);
+          messages.length = 0;
+          messages.push(...compacted);
+          accumulatedInputTokens = 0;
+        }
+
+        // 5. Checkpoint conversation state
         await this.sessions.checkpoint(
           session.session_id,
           { messages, iteration } as Record<string, unknown>,
           iteration,
         );
 
-        // 5. Check terminal state — end_turn or no tool use
+        // 6. Check terminal state — end_turn or no tool use
         if (response.stop_reason === 'end_turn') {
           const textContent = response.content.find((b) => b.type === 'text');
           if (textContent && textContent.type === 'text') {
@@ -130,7 +145,7 @@ export abstract class BaseAgent {
           break;
         }
 
-        // 6. Process tool use blocks
+        // 7. Process tool use blocks
         const toolUseBlocks = response.content.filter(
           (b): b is ToolUseBlock => b.type === 'tool_use',
         );
@@ -148,7 +163,7 @@ export abstract class BaseAgent {
             tool_input: toolUse.input as Record<string, unknown>,
           };
 
-          // 7. Pre-hook — permission check
+          // 8. Pre-hook — permission check
           const permission = await this.preHook(action);
 
           if (!permission.allowed) {
@@ -173,10 +188,10 @@ export abstract class BaseAgent {
             continue;
           }
 
-          // 8. Execute tool
+          // 9. Execute tool
           const result = await this.executeTool(action, context);
 
-          // 9. Post-hook — World Model write + decision log (atomic flush)
+          // 10. Post-hook — World Model write + decision log (atomic flush)
           await this.postHook(result, session.session_id, context);
 
           toolResults.push({

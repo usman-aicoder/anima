@@ -5,6 +5,7 @@ import {
   CallToolRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { connect } from '@anima/core';
+import { startHttpServer } from '../shared/http-server.js';
 import { QUALITY_TOOLS } from './tools.js';
 import { runThresholdChecks } from './handlers/run-threshold-checks.js';
 import { checkGoalHealth } from './handlers/check-goal-health.js';
@@ -64,5 +65,6 @@ export async function startServer(
     return;
   }
 
-  throw new Error('HTTP transport not yet implemented. Set ANIMA_TRANSPORT=stdio for local dev.');
+  const port = parseInt(process.env['QUALITY_AGENT_PORT'] ?? '3014', 10);
+  startHttpServer(server, port);
 }
