@@ -1,0 +1,26 @@
+{
+  "name": "anima-platform",
+  "version": "0.0.0",
+  "description": "Anima platform — World Model API, harness, BullMQ worker",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@anima/core": "workspace:*",
+    "@anima/agents": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "*"
+  }
+}

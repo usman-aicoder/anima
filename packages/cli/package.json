@@ -1,0 +1,28 @@
+{
+  "name": "@anima/cli",
+  "version": "0.0.0",
+  "description": "Anima CLI — npx create-anima-app",
+  "bin": {
+    "create-anima-app": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@anima/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "*"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@anima/core",
+  "version": "0.0.0",
+  "description": "Core primitives: WorldModelClient, DecisionLogger, BaseAgent, GoalReader, SessionManager",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "*"
+  }
+}
