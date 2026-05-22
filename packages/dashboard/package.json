@@ -2,24 +2,29 @@
   "name": "@anima/dashboard",
   "version": "0.0.0",
   "description": "Anima dashboard — goal tree, agent status, escalations, onboarding",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
+  "private": true,
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "start": "next start --port 3001",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf .next"
   },
   "dependencies": {
-    "@anima/core": "workspace:*"
+    "@anima/core": "workspace:*",
+    "next": "14.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.378.0"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
     "typescript": "*"
   }
 }
