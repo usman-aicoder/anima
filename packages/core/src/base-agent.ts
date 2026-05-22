@@ -1,5 +1,7 @@
-import Anthropic from '@anthropic-ai/sdk';
-import type { MessageParam, Tool, ToolUseBlock } from '@anthropic-ai/sdk/resources/messages.js';
+import type { Tool } from '@anthropic-ai/sdk/resources/messages.js';
+import type { MessageParam } from '@anthropic-ai/sdk/resources/messages.js';
+import { createLLMClient } from './llm/index.js';
+import type { LLMClient, NormalizedToolUseBlock } from './llm/index.js';
 import { DecisionLogger, type DecisionEntry } from './decision-logger.js';
 import { SessionManager } from './session-manager.js';
 import { WorldModelClient } from './world-model-client.js';
@@ -8,7 +10,6 @@ import type { AgentName } from './db/models/agent-decision.model.js';
 import type { IGoal } from './db/models/goal.model.js';
 
 // 80% of the default max_tokens_per_session threshold (80 000).
-// When accumulated input tokens across iterations exceed this, compact messages.
 const COMPACTION_THRESHOLD = 64_000;
 
 export interface AgentContext {
@@ -53,15 +54,13 @@ export interface PreHookResult {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export abstract class BaseAgent {
-  protected readonly client: Anthropic;
+  protected readonly client: LLMClient;
   protected readonly logger: DecisionLogger;
   protected readonly sessions: SessionManager;
   protected readonly wm: typeof WorldModelClient;
 
   constructor() {
-    this.client = new Anthropic({
-      apiKey: process.env['ANTHROPIC_API_KEY'],
-    });
+    this.client = createLLMClient();
     this.logger = new DecisionLogger();
     this.sessions = new SessionManager();
     this.wm = WorldModelClient;
@@ -102,8 +101,8 @@ export abstract class BaseAgent {
           messages.push({ role: 'user', content: mission });
         }
 
-        // 3. Call Claude API
-        const response = await this.client.messages.create({
+        // 3. Call LLM (Anthropic or Ollama, selected by ANIMA_PROVIDER env var)
+        const response = await this.client.complete({
           model: process.env['ANIMA_MODEL'] ?? 'claude-sonnet-4-6',
           max_tokens: 4096,
           system,
@@ -129,17 +128,17 @@ export abstract class BaseAgent {
 
         // 6. Check terminal state — end_turn or no tool use
         if (response.stop_reason === 'end_turn') {
-          const textContent = response.content.find((b) => b.type === 'text');
-          if (textContent && textContent.type === 'text') {
+          const textBlock = response.content.find((b) => b.type === 'text');
+          if (textBlock?.type === 'text') {
             await this.logger.log({
               session_id: session.session_id,
               agent: this.getAgentName(),
               decision_type: 'mission_complete',
               input_signal: mission,
               decision: 'mission completed',
-              reasoning: textContent.text,
-              output: textContent.text,
-              token_usage: this.extractTokenUsage(response.usage),
+              reasoning: textBlock.text,
+              output: textBlock.text,
+              token_usage: this.estimateTokenCost(response.usage),
             });
           }
           break;
@@ -147,27 +146,26 @@ export abstract class BaseAgent {
 
         // 7. Process tool use blocks
         const toolUseBlocks = response.content.filter(
-          (b): b is ToolUseBlock => b.type === 'tool_use',
+          (b): b is NormalizedToolUseBlock => b.type === 'tool_use',
         );
 
         if (toolUseBlocks.length === 0) break;
 
-        // Add assistant turn to messages
-        messages.push({ role: 'assistant', content: response.content });
+        // Add assistant turn to messages (content is structurally compatible with MessageParam)
+        messages.push({ role: 'assistant', content: response.content as MessageParam['content'] });
 
-        const toolResults: MessageParam['content'] = [];
+        const toolResults: Array<{ type: 'tool_result'; tool_use_id: string; content: string }> = [];
 
         for (const toolUse of toolUseBlocks) {
           const action: ActionRequest = {
             tool_name: toolUse.name,
-            tool_input: toolUse.input as Record<string, unknown>,
+            tool_input: toolUse.input,
           };
 
           // 8. Pre-hook — permission check
           const permission = await this.preHook(action);
 
           if (!permission.allowed) {
-            // Log escalation and surface result to model
             await this.logger.log({
               session_id: session.session_id,
               agent: this.getAgentName(),
@@ -177,7 +175,7 @@ export abstract class BaseAgent {
               reasoning: permission.reason ?? 'permission denied',
               output: 'escalated',
               escalated_to_human: true,
-              token_usage: this.extractTokenUsage(response.usage),
+              token_usage: this.estimateTokenCost(response.usage),
             });
 
             toolResults.push({
@@ -202,7 +200,7 @@ export abstract class BaseAgent {
         }
 
         // Add tool results as user turn
-        messages.push({ role: 'user', content: toolResults });
+        messages.push({ role: 'user', content: toolResults as MessageParam['content'] });
       }
 
       await this.sessions.complete(session.session_id);
@@ -222,13 +220,17 @@ export abstract class BaseAgent {
     ].join('\n\n');
   }
 
-  private extractTokenUsage(usage: {
+  private estimateTokenCost(usage: {
     input_tokens: number;
     output_tokens: number;
   }): { input_tokens: number; output_tokens: number; cost_sek: number } {
-    // Cost estimate: Sonnet input ~$3/MTok, output ~$15/MTok → convert to SEK (~10 SEK/USD)
+    // Cost estimate for Anthropic Sonnet: $3/MTok input, $15/MTok output → SEK at ~10 SEK/USD
+    // Ollama is local so cost is 0, but we keep the field for schema consistency
+    const provider = process.env['ANIMA_PROVIDER'] ?? 'anthropic';
     const cost_usd =
-      (usage.input_tokens / 1_000_000) * 3 + (usage.output_tokens / 1_000_000) * 15;
+      provider === 'ollama'
+        ? 0
+        : (usage.input_tokens / 1_000_000) * 3 + (usage.output_tokens / 1_000_000) * 15;
     return {
       input_tokens: usage.input_tokens,
       output_tokens: usage.output_tokens,

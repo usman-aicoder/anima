@@ -30,6 +30,8 @@ export { QualityConfig, type IQualityConfig, DEFAULT_QUALITY_CONFIGS } from './d
 // Core primitives
 export { WorldModelClient } from './world-model-client.js';
 export { compactMessages } from './harness/compaction.js';
+export { createLLMClient } from './llm/index.js';
+export type { LLMClient, LLMResponse, NormalizedBlock } from './llm/index.js';
 export { DecisionLogger, type DecisionEntry } from './decision-logger.js';
 export { SessionManager } from './session-manager.js';
 export { GoalReader } from './goal-reader.js';

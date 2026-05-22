@@ -2,11 +2,11 @@ import type { AgentName } from '@anima/core';
 import { queues, type AgentQueueName, type AgentJobPayload } from './queues.js';
 
 const AGENT_QUEUE_MAP: Record<AgentName, AgentQueueName> = {
-  growth: 'anima:growth',
-  strategy: 'anima:strategy',
-  operations: 'anima:operations',
-  finance: 'anima:finance',
-  quality: 'anima:quality',
+  growth: 'anima-growth',
+  strategy: 'anima-strategy',
+  operations: 'anima-operations',
+  finance: 'anima-finance',
+  quality: 'anima-quality',
 };
 
 export async function dispatchMission(

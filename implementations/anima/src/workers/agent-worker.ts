@@ -17,11 +17,11 @@ function makeConnection(): Redis {
 
 function makeAgent(queueName: AgentQueueName, company_name: string) {
   switch (queueName) {
-    case 'anima:growth': return new GrowthAgent(company_name);
-    case 'anima:strategy': return new StrategyAgent(company_name);
-    case 'anima:operations': return new OperationsAgent(company_name);
-    case 'anima:quality': return new QualityAgent(company_name);
-    case 'anima:finance': return new FinanceAgent(company_name);
+    case 'anima-growth': return new GrowthAgent(company_name);
+    case 'anima-strategy': return new StrategyAgent(company_name);
+    case 'anima-operations': return new OperationsAgent(company_name);
+    case 'anima-quality': return new QualityAgent(company_name);
+    case 'anima-finance': return new FinanceAgent(company_name);
   }
 }
 

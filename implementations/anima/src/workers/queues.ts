@@ -8,11 +8,11 @@ export interface AgentJobPayload {
 }
 
 export type AgentQueueName =
-  | 'anima:growth'
-  | 'anima:strategy'
-  | 'anima:operations'
-  | 'anima:finance'
-  | 'anima:quality';
+  | 'anima-growth'
+  | 'anima-strategy'
+  | 'anima-operations'
+  | 'anima-finance'
+  | 'anima-quality';
 
 function makeConnection(): Redis {
   const url = process.env['REDIS_URL'] ?? 'redis://localhost:6379';
@@ -24,9 +24,9 @@ function makeQueue(name: AgentQueueName): Queue<AgentJobPayload> {
 }
 
 export const queues: Record<AgentQueueName, Queue<AgentJobPayload>> = {
-  'anima:growth': makeQueue('anima:growth'),
-  'anima:strategy': makeQueue('anima:strategy'),
-  'anima:operations': makeQueue('anima:operations'),
-  'anima:finance': makeQueue('anima:finance'),
-  'anima:quality': makeQueue('anima:quality'),
+  'anima-growth': makeQueue('anima-growth'),
+  'anima-strategy': makeQueue('anima-strategy'),
+  'anima-operations': makeQueue('anima-operations'),
+  'anima-finance': makeQueue('anima-finance'),
+  'anima-quality': makeQueue('anima-quality'),
 };

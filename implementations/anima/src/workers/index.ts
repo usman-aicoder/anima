@@ -2,11 +2,11 @@ import { queues, type AgentQueueName } from './queues.js';
 import { createAgentWorker } from './agent-worker.js';
 
 const QUEUE_NAMES: AgentQueueName[] = [
-  'anima:growth',
-  'anima:strategy',
-  'anima:operations',
-  'anima:finance',
-  'anima:quality',
+  'anima-growth',
+  'anima-strategy',
+  'anima-operations',
+  'anima-finance',
+  'anima-quality',
 ];
 
 // Quality Agent runs on a schedule: every 30 minutes (configurable via
@@ -23,7 +23,7 @@ export async function startWorkers(company_name: string): Promise<void> {
   }
 
   // Register Quality Agent as a repeatable job
-  const qualityQueue = queues['anima:quality'];
+  const qualityQueue = queues['anima-quality'];
   await qualityQueue.add(
     'quality-monitor',
     { company_name, mission: 'Run threshold checks and goal health monitoring.' },
