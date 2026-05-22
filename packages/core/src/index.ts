@@ -40,3 +40,6 @@ export {
   type ActionResult,
   type PreHookResult,
 } from './base-agent.js';
+
+// Export / Import
+export { exportCompany, importCompany, type CompanySnapshot } from './export/company-export.js';

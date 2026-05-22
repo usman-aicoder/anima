@@ -12,6 +12,7 @@ import { documentsRoutes } from './documents.js';
 import { escalationsRoutes } from './escalations.js';
 import { qualityAlertsRoutes } from './quality-alerts.js';
 import { qualityConfigRoutes } from './quality-config.js';
+import { exportRoutes } from './export.js';
 
 export async function registerRoutes(app: FastifyInstance): Promise<void> {
   await app.register(goalsRoutes);
@@ -27,4 +28,5 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
   await app.register(escalationsRoutes);
   await app.register(qualityAlertsRoutes);
   await app.register(qualityConfigRoutes);
+  await app.register(exportRoutes);
 }
