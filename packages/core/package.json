@@ -2,6 +2,7 @@
   "name": "@anima/core",
   "version": "0.0.0",
   "description": "Core primitives: WorldModelClient, DecisionLogger, BaseAgent, GoalReader, SessionManager",
+  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

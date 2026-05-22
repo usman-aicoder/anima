@@ -1,6 +1,17 @@
 // Database
 export { connect, disconnect } from './db/connection.js';
 
+// Company wiki types
+export {
+  WIKI_KEYS,
+  type SeoKeyword,
+  type ContentGuidelines,
+  type TechStack,
+  type PostingSchedule,
+  type PartnerRequirements,
+  type RequestSchema,
+} from './types/company-wiki-types.js';
+
 // Models
 export { Goal, type IGoal } from './db/models/goal.model.js';
 export { Task, type ITask } from './db/models/task.model.js';

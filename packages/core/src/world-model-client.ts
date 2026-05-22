@@ -19,11 +19,13 @@ import {
 // ─── Goals ───────────────────────────────────────────────────────────────────
 
 export const goals = {
-  findActive(): Promise<IGoal[]> {
-    return Goal.find({
+  findActive(owner_agent?: IGoal['owner_agent']): Promise<IGoal[]> {
+    const filter: Record<string, unknown> = {
       status: 'active',
       'governance.approved_at': { $ne: null },
-    }).lean<IGoal[]>().exec();
+    };
+    if (owner_agent) filter['owner_agent'] = owner_agent;
+    return Goal.find(filter).lean<IGoal[]>().exec();
   },
 
   findById(goal_id: string): Promise<IGoal | null> {
@@ -273,6 +275,11 @@ export const companyWiki = {
       return existing.save();
     }
     return CompanyWiki.create({ company_name, category, key, value, updated_by });
+  },
+
+  async getTyped<T>(company_name: string, category: string, key: string): Promise<T | null> {
+    const doc = await CompanyWiki.findOne({ company_name, category, key }).lean<ICompanyWiki>().exec();
+    return doc ? (doc.value as T) : null;
   },
 };
 
