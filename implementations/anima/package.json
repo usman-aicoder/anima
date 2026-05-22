@@ -1,26 +1,29 @@
 {
   "name": "anima-platform",
   "version": "0.0.0",
-  "description": "Anima platform — World Model API, harness, BullMQ worker",
+  "description": "Anima platform — World Model API, BullMQ workers, agent orchestration",
+  "type": "module",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
   "dependencies": {
     "@anima/core": "workspace:*",
-    "@anima/agents": "workspace:*"
+    "@anima/agents": "workspace:*",
+    "@anthropic-ai/sdk": "^0.27.0",
+    "@fastify/cors": "^9.0.0",
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^3.0.0",
+    "fastify": "^4.28.0",
+    "ioredis": "^5.3.2"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
     "typescript": "*"
   }
 }

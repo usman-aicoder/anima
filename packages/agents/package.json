@@ -20,9 +20,11 @@
   "dependencies": {
     "@anima/core": "workspace:*",
     "@anthropic-ai/sdk": "^0.27.0",
-    "@modelcontextprotocol/sdk": "^1.0.0"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.0",
     "typescript": "*"
   }
 }
