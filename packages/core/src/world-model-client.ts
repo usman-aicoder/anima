@@ -19,6 +19,12 @@ import {
 // ─── Goals ───────────────────────────────────────────────────────────────────
 
 export const goals = {
+  findAll(owner_agent?: IGoal['owner_agent']): Promise<IGoal[]> {
+    const filter: Record<string, unknown> = {};
+    if (owner_agent) filter['owner_agent'] = owner_agent;
+    return Goal.find(filter).sort({ 'governance.created_at': -1 }).lean<IGoal[]>().exec();
+  },
+
   findActive(owner_agent?: IGoal['owner_agent']): Promise<IGoal[]> {
     const filter: Record<string, unknown> = {
       status: 'active',

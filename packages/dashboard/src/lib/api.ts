@@ -82,7 +82,7 @@ export const api = {
   goals: {
     list: () => apiFetch<Goal[]>('/goals'),
     approve: (goal_id: string) =>
-      apiFetch<Goal>(`/goals/${goal_id}`, {
+      apiFetch<Goal>(`/goals/${goal_id}/approve`, {
         method: 'PATCH',
         body: JSON.stringify({ approved_by: 'human_proxy' }),
       }),
@@ -92,16 +92,16 @@ export const api = {
     list: () => apiFetch<Task[]>('/tasks'),
     listHuman: () => apiFetch<Task[]>('/tasks?type=human&status=pending'),
     complete: (task_id: string) =>
-      apiFetch<Task>(`/tasks/${task_id}`, {
+      apiFetch<Task>(`/tasks/${task_id}/complete`, {
         method: 'PATCH',
-        body: JSON.stringify({ status: 'completed', completed_by: 'human_proxy' }),
+        body: JSON.stringify({ completed_by: 'human_proxy', evidence: [] }),
       }),
   },
 
   escalations: {
-    list: () => apiFetch<Escalation[]>('/escalations'),
+    list: () => apiFetch<Escalation[]>('/escalations/pending'),
     decide: (escalation_id: string, decision: 'approved' | 'rejected', reason: string) =>
-      apiFetch<Escalation>(`/escalations/${escalation_id}`, {
+      apiFetch<Escalation>(`/escalations/${escalation_id}/decide`, {
         method: 'PATCH',
         body: JSON.stringify({ decision, decision_by: 'human_proxy', decision_reason: reason }),
       }),
@@ -110,7 +110,7 @@ export const api = {
   qualityAlerts: {
     list: () => apiFetch<QualityAlert[]>('/quality-alerts'),
     resolve: (alert_id: string) =>
-      apiFetch<QualityAlert>(`/quality-alerts/${alert_id}`, {
+      apiFetch<QualityAlert>(`/quality-alerts/${alert_id}/resolve`, {
         method: 'PATCH',
         body: JSON.stringify({ resolved: true }),
       }),

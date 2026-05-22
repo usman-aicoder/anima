@@ -6,11 +6,12 @@ export async function goalsRoutes(app: FastifyInstance): Promise<void> {
   app.get('/goals', async (req) => {
     const { owner_agent, status } = req.query as Record<string, string>;
     const key = `anima:goals:${owner_agent ?? 'all'}:${status ?? 'all'}`;
-    return cacheGet(key, CACHE_TTL, () =>
-      status === 'at_risk'
-        ? WorldModelClient.goals.findAtRisk()
-        : WorldModelClient.goals.findActive(owner_agent as never),
-    );
+    return cacheGet(key, CACHE_TTL, () => {
+      if (status === 'at_risk') return WorldModelClient.goals.findAtRisk();
+      if (status === 'active') return WorldModelClient.goals.findActive(owner_agent as never);
+      // No status filter (dashboard) — return all goals
+      return WorldModelClient.goals.findAll(owner_agent as never);
+    });
   });
 
   app.get('/goals/:goal_id', async (req, reply) => {
