@@ -3,3 +3,4 @@ export { StrategyAgent, startStrategyServer, runIntake, buildGoalTree, generateH
 export type { IntakeAnswer, OnboardingResult, GoalTreeInput, HumanTaskDraft, ExtractedFact } from './strategy/index.js';
 export { OperationsAgent, startOperationsServer, OPERATIONS_TOOLS } from './operations/index.js';
 export { QualityAgent, startQualityServer, QUALITY_TOOLS } from './quality/index.js';
+export { FinanceAgent, startFinanceServer, FINANCE_TOOLS } from './finance/index.js';

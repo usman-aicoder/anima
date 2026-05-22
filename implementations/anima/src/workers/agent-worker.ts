@@ -4,6 +4,7 @@ import {
   GrowthAgent,
   StrategyAgent,
   OperationsAgent,
+  FinanceAgent,
   QualityAgent,
 } from '@anima/agents';
 import type { AgentQueueName, AgentJobPayload } from './queues.js';
@@ -20,9 +21,7 @@ function makeAgent(queueName: AgentQueueName, company_name: string) {
     case 'anima:strategy': return new StrategyAgent(company_name);
     case 'anima:operations': return new OperationsAgent(company_name);
     case 'anima:quality': return new QualityAgent(company_name);
-    case 'anima:finance':
-      // Finance agent is Sprint 7 — log and skip
-      return null;
+    case 'anima:finance': return new FinanceAgent(company_name);
   }
 }
 
