@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node -e \"const fs=require('fs');['growth','strategy','operations','finance','quality'].forEach(a=>{const s='src/'+a+'/AGENTS.md';if(fs.existsSync(s))fs.copyFileSync(s,'dist/'+a+'/AGENTS.md');})\"",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
