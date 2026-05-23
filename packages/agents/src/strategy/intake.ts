@@ -1,15 +1,14 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { createLLMClient } from '@anima/core';
 import { writeFacts } from './wiki-writer.js';
 import { INTAKE_QUESTIONS } from './types.js';
 import type { IntakeAnswer, ExtractedFact, OnboardingResult } from './types.js';
-
-const client = new Anthropic({ apiKey: process.env['ANTHROPIC_API_KEY'] });
 
 async function extractFacts(
   question: string,
   answer: string,
   wiki_hint: string,
 ): Promise<ExtractedFact[]> {
+  const client = createLLMClient();
   const prompt = `You are extracting structured facts from a business onboarding answer.
 
 Question asked: "${question}"
@@ -28,17 +27,14 @@ Rules:
 - If the answer is vague, extract a "description" key with the raw text.
 - Return only the JSON array. No explanation.`;
 
-  const response = await client.messages.create({
+  const summary = await client.summarize({
     model: process.env['ANIMA_MODEL'] ?? 'claude-sonnet-4-6',
     max_tokens: 1024,
-    messages: [{ role: 'user', content: prompt }],
+    prompt,
   });
 
-  const text = response.content.find((b) => b.type === 'text');
-  if (!text || text.type !== 'text') return [];
-
   try {
-    const raw = text.text.trim().replace(/^```json\n?/, '').replace(/\n?```$/, '');
+    const raw = summary.trim().replace(/^```json\n?/, '').replace(/\n?```$/, '');
     const parsed = JSON.parse(raw) as ExtractedFact[];
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -51,23 +47,16 @@ export async function runIntake(
 ): Promise<OnboardingResult> {
   if (answers.length === 0) throw new Error('No answers provided');
 
-  // Company name comes from question 1
   const q1Answer = answers.find((a) => a.question_id === 1);
   if (!q1Answer) throw new Error('Question 1 (business name) is required');
 
-  // Extract company name from the first answer using a quick Claude call
-  const nameExtractionResponse = await client.messages.create({
+  const client = createLLMClient();
+  const nameRaw = await client.summarize({
     model: process.env['ANIMA_MODEL'] ?? 'claude-sonnet-4-6',
     max_tokens: 100,
-    messages: [{
-      role: 'user',
-      content: `Extract only the business name from this text. Return just the name, nothing else: "${q1Answer.answer}"`,
-    }],
+    prompt: `Extract only the business name from this text. Return just the name, nothing else: "${q1Answer.answer}"`,
   });
-  const nameBlock = nameExtractionResponse.content.find((b) => b.type === 'text');
-  const company_name = nameBlock?.type === 'text'
-    ? nameBlock.text.trim().replace(/["'.]/g, '')
-    : q1Answer.answer.split(/[\s,]/)[0] ?? 'Unknown';
+  const company_name = nameRaw.trim().replace(/["'.]/g, '') || q1Answer.answer.split(/[\s,]/)[0] || 'Unknown';
 
   const allFacts: ExtractedFact[] = [];
 
@@ -77,8 +66,6 @@ export async function runIntake(
 
     const facts = await extractFacts(question.question, answer.answer, question.wiki_hint);
     allFacts.push(...facts);
-
-    // Write immediately after each answer — do not batch
     await writeFacts(company_name, facts, 'strategy-agent-intake');
   }
 

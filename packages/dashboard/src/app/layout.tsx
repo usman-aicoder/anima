@@ -13,6 +13,7 @@ const NAV = [
   { href: '/tasks', label: 'Tasks' },
   { href: '/escalations', label: 'Escalations' },
   { href: '/alerts', label: 'Alerts' },
+  { href: '/onboard', label: 'Onboarding' },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

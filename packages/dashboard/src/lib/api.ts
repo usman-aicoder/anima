@@ -119,4 +119,18 @@ export const api = {
   agentDecisions: {
     recent: (limit = 20) => apiFetch<AgentDecision[]>(`/agent-decisions?limit=${limit}`),
   },
+
+  onboarding: {
+    run: (company_name: string, answers: Array<{ question_id: number; question: string; answer: string }>) =>
+      apiFetch<{ company_name: string; facts_written: number; goal_tree_queued: boolean; message: string }>(
+        '/onboarding/run',
+        { method: 'POST', body: JSON.stringify({ company_name, answers }) },
+      ),
+  },
+
+  dispatch: (agent: string, mission: string, company_name: string, goal_id?: string) =>
+    apiFetch<{ queued: boolean; job_id: string; agent: string; mission: string }>(
+      '/dispatch',
+      { method: 'POST', body: JSON.stringify({ agent, mission, company_name, ...(goal_id ? { goal_id } : {}) }) },
+    ),
 };
