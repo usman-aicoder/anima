@@ -1,5 +1,22 @@
 # Anima
 
+Highest value of the three: it is the companion to four articles, including the newest
+comparison piece.
+
+```markdown
+## Background reading
+
+This platform is the working code behind a series of articles on getting plant-floor data
+into a place where it can actually be used:
+
+- [Monitor Industrial Data in Real Time Without an Expensive Historian](https://www.usman-nasir.com/articles/monitor-industrial-data-without-a-historian) — what this platform does and why it exists
+- [OT Data to the Cloud: An Architecture Guide for Engineers](https://www.usman-nasir.com/articles/ot-data-to-cloud-architecture) — the full architecture, PLC to cloud
+- [Process Historian vs Time-Series Database vs Data Lake](https://www.usman-nasir.com/articles/historian-vs-tsdb-vs-datalake) — where each storage layer fits
+- [The OT/IT Divide: Why Industrial Data Stayed Trapped for Decades](https://www.usman-nasir.com/articles/factory-floor-to-cloud) — the wider context
+
+Written by [Usman Nasir](https://www.usman-nasir.com), control systems engineer, Stockholm.
+```
+
 **You sign. AI runs everything.**
 
 Anima is a generic AI operating system for SMEs. Five agents — Growth, Strategy, Operations, Finance, and Quality — run your business autonomously while you spend 4–6 hours a week reviewing decisions and approving escalations.
