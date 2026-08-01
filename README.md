@@ -6,13 +6,8 @@ comparison piece.
 ```markdown
 ## Background reading
 
-This platform is the working code behind a series of articles on getting plant-floor data
-into a place where it can actually be used:
-
-- [Monitor Industrial Data in Real Time Without an Expensive Historian](https://www.usman-nasir.com/articles/monitor-industrial-data-without-a-historian) — what this platform does and why it exists
-- [OT Data to the Cloud: An Architecture Guide for Engineers](https://www.usman-nasir.com/articles/ot-data-to-cloud-architecture) — the full architecture, PLC to cloud
-- [Process Historian vs Time-Series Database vs Data Lake](https://www.usman-nasir.com/articles/historian-vs-tsdb-vs-datalake) — where each storage layer fits
-- [The OT/IT Divide: Why Industrial Data Stayed Trapped for Decades](https://www.usman-nasir.com/articles/factory-floor-to-cloud) — the wider context
+- [Anima: What a Company Run by AI Actually Looks Like](https://www.usman-nasir.com/articles/anima-company-run-by-ai) — the concept behind this project, the World Model, the five agents, and why the human stays at the boundary
+- [The Five Pillars of Agentic AI Architecture](https://www.usman-nasir.com/articles/five-pillars-of-agentic-ai-architecture) — the building blocks this system is assembled from
 
 Written by [Usman Nasir](https://www.usman-nasir.com), control systems engineer, Stockholm.
 ```
